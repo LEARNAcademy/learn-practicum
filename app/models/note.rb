@@ -1,24 +1,29 @@
-class Team < ApplicationRecord
-  include Teams::Base
-  include Webhooks::Outgoing::TeamSupport
+class Note < ApplicationRecord
   # 🚅 add concerns above.
 
+  # 🚅 add attribute accessors above.
+
+  belongs_to :team
+  belongs_to :creator, class_name: "Membership"
   # 🚅 add belongs_to associations above.
 
-  has_many :notes, dependent: :destroy, enable_cable_ready_updates: true
   # 🚅 add has_many associations above.
 
-  # 🚅 add oauth providers above.
-
+  has_rich_text :body
   # 🚅 add has_one associations above.
 
   # 🚅 add scopes above.
 
+  validates :creator, scope: true
   # 🚅 add validations above.
 
   # 🚅 add callbacks above.
 
   # 🚅 add delegations above.
+
+  def valid_creators
+    team.users
+  end
 
   # 🚅 add methods above.
 end

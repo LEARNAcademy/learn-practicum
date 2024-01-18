@@ -1,58 +1,24 @@
-# Bullet Train Application Template
-If you're new to Bullet Train, start with the [Bullet Train Developer Documentation](https://bullettrain.co/docs) and the [Getting Started](https://bullettrain.co/docs/getting-started) guide. You should also [join the community Discord server](https://discord.gg/bullettrain)!
+# LEARN Notes Application
 
-## Building a New Application with Bullet Train
-If you're building a new application with Bullet Train, you don't want to "Fork" the template repository on GitHub. Instead, you should:
+### Getting Started
 
-1. Clone the template repository:
+1. You must have the following dependencies installed:
 
-    ```
-    git clone git@github.com:bullet-train-co/bullet_train.git your_new_project_name
-    ```
+   - Ruby 3
+     - See [`.ruby-version`](.ruby-version) for the specific version.
+   - Node 19
+     - See [`.nvmrc`](.nvmrc) for the specific version.
+   - PostgreSQL 14
+   - Redis 6.2
+   - [Chrome](https://www.google.com/search?q=chrome) (for headless browser tests)
 
-2. Enter the project directory:
+2. Run the `bin/setup` script.
+3. Start the application with `bin/dev`.
+4. Visit http://localhost:3000.
 
-    ```
-    cd your_new_project_name
-    ```
+## Information about Bullet Train
 
-3. Run the configuration and setup scripts:
-
-    ```
-    bin/configure
-    bin/setup
-    ```
-    
-4. Boot your application:
-
-    ```
-    bin/dev
-    ```
-    
-5. Visit `http://localhost:3000`.
-
-## Cloud Development with Gitpod
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/bullet-train-co/bullet_train)
-
-Clicking this button will set up a new Bullet Train project for development on [Gitpod](https://gitpod.io).
-
-<br>
-<br>
-
-<p align="center">
-<strong>Open-source development sponsored by:</strong>
-</p>
-
-<p align="center">
-<a href="https://www.clickfunnels.com"><img src="https://images.clickfunnel.com/uploads/digital_asset/file/176632/clickfunnels-dark-logo.svg" width="575" /></a>
-</p>
-
-<br>
-<br>
-
-## Provisioning a Production Environment
-You can use this public repository to provision a new application and then push your private application code there later.
+If this is your first time working on a Bullet Train application, be sure to review the [Bullet Train Basic Techniques](https://bullettrain.co/docs/getting-started) and the [Bullet Train Developer Documentation](https://bullettrain.co/docs).
 
 ### Render
 
@@ -62,48 +28,67 @@ Clicking this button will take you to the first step of a process that, when com
 
 When you're done deploying to Render, you need to go into "Dashboard" > "web", copy the server URL, and then go into "Env Groups" > "settings" and paste the URL into the value for `BASE_URL`.
 
-### Heroku
+https://github.com/bullet-train-co/bullet_train.git
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=http://github.com/bullet-train-co/bullet_train)
+git@github.com:bullet-train-co/bullet_train.git
 
-Clicking this button will take you to the first step of a process that, when completed, will provision production-grade infrastructure and services for your Bullet Train application which will cost about **$140/month**.
+git clone git@github.com:bullet-train-co/bullet_train.git your_new_project_name
 
-Once that process has completed, be sure to complete the other steps from the [Deploying to Heroku](https://bullettrain.co/docs/heroku) documentation.
+bin/super-scaffold crud Note Team title:text_field body:text_area
 
-## Contribute to Bullet Train
-If you're looking contribute to Bullet Train, you should "Fork" this template repository on GitHub, like so:
+1. If you would like the table view you've just generated to reactively update when a Note is updated on the server, please edit `app/models/team.rb`, locate the `has_many :notes`, and add `enable_cable_ready_updates: true` to it.
 
-1. Visit https://github.com/bullet-train-co/bullet_train.
-2. Click "Fork" in the top-right corner.
-3. Select the account where you want to fork the repository.
-4. Click the "Code" button on the new repository and copy the SSH path.
-5. Clone your forked repository using the SSH path you copied, like so:
+app/model/note.rb (done)
+class Note < ApplicationRecord
 
-    ```
-    git clone git@github.com:your-account/bullet_train.git
-    cd bullet_train
-    ```
+# 🚅 add concerns above.
 
-6. Run the setup script:
+# 🚅 add attribute accessors above.
 
-    ```
-    bin/setup
-    ```
+belongs_to :team
+belongs_to :creator, class_name: "Membership"
 
-7. Start the application:
+# 🚅 add belongs_to associations above.
 
-    ```
-    bin/dev
-    ```
+# 🚅 add has_many associations above.
 
-    > [!NOTE]
-    > Optional: If you have [ngrok](https://ngrok.com/) installed, uncomment `ngrok: ngrok http 3000` from `Procfile.dev` and run
-    > `bin/set-ngrok-url` to set `BASE_URL` to a publically accessible domain.
-    > Run `bin/set-ngrok-url` after restarting `ngrok` to update `BASE_URL` to
-    > the current public url.
+has_rich_text :body
 
-8. Visit http://localhost:3000.
+# 🚅 add has_one associations above.
 
----
+# 🚅 add scopes above.
 
-This `README.md` file will be replaced with [`README.example.md`](./README.example.md) after running `bin/configure`.
+validates :creator, scope: true
+
+# 🚅 add validations above.
+
+# 🚅 add callbacks above.
+
+# 🚅 add delegations above.
+
+def valid_creators
+team.users
+end
+
+# 🚅 add methods above.
+
+end
+
+app/views/account/notes/\_form.html.erb
+on line 9 (done)
+<%= render 'shared/fields/super_select', method: :creator_id, options: {autofocus: true}, html_options: {autofocus: true},
+choices: @note.valid_creators.map { |membership| [membership.label_string, membership.id] } %>
+
+app/views/account/notes/\_index.html.erb
+line 26
+
+<th><%= t('.fields.creator.heading') %></th>
+
+app/views/account/notes/\_note.html.erb
+line 10 (done)
+
+<td><%= render 'shared/attributes/belongs_to', attribute: :creator, url: [:account, note] %></td>
+
+app/views/account/notes/show.html.erb
+Line 14 (done)
+<%= render 'shared/attributes/belongs_to', attribute: :creator %>
