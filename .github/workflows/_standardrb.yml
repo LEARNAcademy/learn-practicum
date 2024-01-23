@@ -2,9 +2,7 @@
 #
 # This workflow is pimarily meant to be called by other workflows, but it can be run manually.
 name: "🔬 ~ Standardrb"
-on:
-  workflow_call:
-  workflow_dispatch:
+on: push
 
 jobs:
   lint:
@@ -26,4 +24,4 @@ jobs:
 
       - name: Run Standardrb
         id: run-standardrb
-        run : bundle exec standardrb
+        run: bundle exec standardrb
